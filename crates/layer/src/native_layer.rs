@@ -4,8 +4,8 @@ use std::sync::atomic;
 use std::{borrow, env, marker, mem, process, sync, thread, time};
 
 use prost::encoding;
-#[cfg(feature = "tokio")]
-use tokio::task;
+#[cfg(feature = "async_runtime")]
+use async_runtime::task;
 use tracing::span;
 use tracing_perfetto_sdk_schema as schema;
 use tracing_perfetto_sdk_schema::{
@@ -67,13 +67,13 @@ where
     create_async_tracks: Option<String>,
     process_track_uuid: ids::TrackUuid,
     process_descriptor_sent: atomic::AtomicBool,
-    #[cfg(feature = "tokio")]
+    #[cfg(feature = "async_runtime")]
     tokio_descriptor_sent: atomic::AtomicBool,
-    #[cfg(feature = "tokio")]
+    #[cfg(feature = "async_runtime")]
     tokio_track_uuid: ids::TrackUuid,
     counter_tracks_sent: dashmap::DashSet<&'static str>,
     thread_tracks_sent: dashmap::DashSet<usize>,
-    #[cfg(feature = "tokio")]
+    #[cfg(feature = "async_runtime")]
     task_tracks_sent: dashmap::DashSet<task::Id>,
 }
 
@@ -157,13 +157,13 @@ where
         let pid = process::id();
         let process_track_uuid = ids::TrackUuid::for_process(pid);
         let process_descriptor_sent = atomic::AtomicBool::new(false);
-        #[cfg(feature = "tokio")]
+        #[cfg(feature = "async_runtime")]
         let tokio_descriptor_sent = atomic::AtomicBool::new(false);
-        #[cfg(feature = "tokio")]
+        #[cfg(feature = "async_runtime")]
         let tokio_track_uuid = ids::TrackUuid::for_tokio();
         let counter_tracks_sent = dashmap::DashSet::new();
         let thread_tracks_sent = dashmap::DashSet::new();
-        #[cfg(feature = "tokio")]
+        #[cfg(feature = "async_runtime")]
         let task_tracks_sent = dashmap::DashSet::new();
 
         let inner = sync::Arc::new(Inner {
@@ -178,13 +178,13 @@ where
             create_async_tracks,
             process_track_uuid,
             process_descriptor_sent,
-            #[cfg(feature = "tokio")]
+            #[cfg(feature = "async_runtime")]
             tokio_descriptor_sent,
-            #[cfg(feature = "tokio")]
+            #[cfg(feature = "async_runtime")]
             tokio_track_uuid,
             counter_tracks_sent,
             thread_tracks_sent,
-            #[cfg(feature = "tokio")]
+            #[cfg(feature = "async_runtime")]
             task_tracks_sent,
         });
 
@@ -203,7 +203,7 @@ where
                     )
                 }
                 flavor::Flavor::Async => {
-                    #[cfg(feature = "tokio")]
+                    #[cfg(feature = "async_runtime")]
                     if let Some(res) =
                         self.tokio_trace_track_sequence(self.inner.process_track_uuid)
                     {
@@ -224,7 +224,7 @@ where
                 }
             }
         } else {
-            #[cfg(feature = "tokio")]
+            #[cfg(feature = "async_runtime")]
             if let Some(res) = self.tokio_trace_track_sequence(self.inner.tokio_track_uuid) {
                 return res;
             }
@@ -238,7 +238,7 @@ where
         }
     }
 
-    #[cfg(feature = "tokio")]
+    #[cfg(feature = "async_runtime")]
     fn tokio_trace_track_sequence(
         &self,
         default_track: ids::TrackUuid,
@@ -374,7 +374,7 @@ where
     fn ensure_context_known(&self, meta: &tracing::Metadata) {
         self.ensure_process_known(meta);
         self.ensure_thread_known(meta);
-        #[cfg(feature = "tokio")]
+        #[cfg(feature = "async_runtime")]
         if let Some(ref name) = self.inner.create_async_tracks {
             self.ensure_task_track_known(meta, name);
         } else {
@@ -420,7 +420,7 @@ where
         }
     }
 
-    #[cfg(feature = "tokio")]
+    #[cfg(feature = "async_runtime")]
     fn ensure_tokio_runtime_known(&self, meta: &tracing::Metadata) {
         let tokio_descriptor_sent = self
             .inner
@@ -432,7 +432,7 @@ where
         }
     }
 
-    #[cfg(feature = "tokio")]
+    #[cfg(feature = "async_runtime")]
     fn ensure_task_track_known(&self, meta: &tracing::Metadata, name: &str) {
         if let Some(task_id) = task::try_id() {
             if self.inner.task_tracks_sent.insert(task_id) {
@@ -514,7 +514,7 @@ where
         }
     }
 
-    #[cfg(feature = "tokio")]
+    #[cfg(feature = "async_runtime")]
     #[must_use]
     fn create_tokio_runtime_track_descriptor(&self) -> schema::TracePacket {
         // Bogus thread ID; this is unlikely to ever be an actually real thread ID.
@@ -531,7 +531,7 @@ where
                         ..Default::default()
                     }),
                     static_or_dynamic_name: Some(track_descriptor::StaticOrDynamicName::Name(
-                        "tokio-runtime".to_owned(),
+                        "async_runtime".to_owned(),
                     )),
                     ..Default::default()
                 },
@@ -540,7 +540,7 @@ where
         }
     }
 
-    #[cfg(feature = "tokio")]
+    #[cfg(feature = "async_runtime")]
     #[must_use]
     fn create_task_track_descriptor(&self, task_id: task::Id, name: String) -> schema::TracePacket {
         let parent_uuid = if self.inner.force_flavor == Some(flavor::Flavor::Async) {

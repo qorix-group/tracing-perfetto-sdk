@@ -15,22 +15,25 @@ prost.workspace = true
 thiserror.workspace = true
 thread-id.workspace = true
 thread_local.workspace = true
-tokio = { workspace = true, optional = true }
+#tokio = { workspace = true, optional = true }
 tracing.workspace = true
 tracing-perfetto-sdk-schema.workspace = true
 tracing-perfetto-sdk-sys = { workspace = true, optional = true }
 tracing-subscriber.workspace = true
 libc = { version = "0.2" }
+async_runtime = { git = "https://github.com/qorix-group/performance_stack_rust.git", branch = "main", optional = true}
 
 [dev-dependencies]
 anyhow.workspace = true
 serde_yaml.workspace = true
-tokio = { workspace = true, features = ["macros", "time", "rt-multi-thread"] }
+#tokio = { workspace = true, features = ["macros", "time", "rt-multi-thread"] }
+async_runtime = {git = "https://github.com/qorix-group/performance_stack_rust.git", branch = "main"}
 tracing-appender.workspace = true
 
 [features]
 default = ["sdk"]
-tokio = ["dep:tokio"]
+#tokio = ["dep:tokio"]
+async_runtime = ["dep:async_runtime"]
 serde = ["tracing-perfetto-sdk-schema/serde"]
 sdk = ["dep:tracing-perfetto-sdk-sys"]
 

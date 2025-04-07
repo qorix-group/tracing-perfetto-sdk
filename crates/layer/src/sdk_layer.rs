@@ -3,8 +3,8 @@ use super::utils::*;
 use std::sync::atomic;
 use std::{borrow, env, fs, process, sync, thread, time};
 
-#[cfg(feature = "tokio")]
-use tokio::task;
+#[cfg(feature = "async_runtime")]
+use async_runtime::task;
 use tracing::span;
 use tracing_perfetto_sdk_schema as schema;
 use tracing_perfetto_sdk_sys::ffi;
@@ -41,9 +41,9 @@ struct Inner {
     drop_flush_timeout: time::Duration,
     process_track_uuid: ids::TrackUuid,
     process_descriptor_sent: atomic::AtomicBool,
-    #[cfg(feature = "tokio")]
+    #[cfg(feature = "async_runtime")]
     tokio_descriptor_sent: atomic::AtomicBool,
-    #[cfg(feature = "tokio")]
+    #[cfg(feature = "async_runtime")]
     tokio_track_uuid: ids::TrackUuid,
     thread_local_ctxs: thread_local::ThreadLocal<ThreadLocalCtx>,
 }
@@ -105,9 +105,9 @@ impl SdkLayer {
 
         let process_track_uuid = ids::TrackUuid::for_process(process::id());
         let process_descriptor_sent = atomic::AtomicBool::new(false);
-        #[cfg(feature = "tokio")]
+        #[cfg(feature = "async_runtime")]
         let tokio_descriptor_sent = atomic::AtomicBool::new(false);
-        #[cfg(feature = "tokio")]
+        #[cfg(feature = "async_runtime")]
         let tokio_track_uuid = ids::TrackUuid::for_tokio();
         let thread_local_ctxs = thread_local::ThreadLocal::new();
 
@@ -117,9 +117,9 @@ impl SdkLayer {
             drop_flush_timeout,
             process_track_uuid,
             process_descriptor_sent,
-            #[cfg(feature = "tokio")]
+            #[cfg(feature = "async_runtime")]
             tokio_descriptor_sent,
-            #[cfg(feature = "tokio")]
+            #[cfg(feature = "async_runtime")]
             tokio_track_uuid,
             thread_local_ctxs,
         });
@@ -129,7 +129,7 @@ impl SdkLayer {
     fn ensure_context_known(&self) {
         self.ensure_process_known();
         self.ensure_thread_known();
-        #[cfg(feature = "tokio")]
+        #[cfg(feature = "async_runtime")]
         self.ensure_tokio_runtime_known();
     }
 
@@ -175,7 +175,7 @@ impl SdkLayer {
         }
     }
 
-    #[cfg(feature = "tokio")]
+    #[cfg(feature = "async_runtime")]
     fn ensure_tokio_runtime_known(&self) {
         // Bogus thread ID; this is unlikely to ever be an actually real thread ID.
         const TOKIO_THREAD_ID: u32 = (i32::MAX - 1) as u32;
@@ -189,14 +189,14 @@ impl SdkLayer {
                 self.inner.process_track_uuid.as_raw(),
                 self.inner.tokio_track_uuid.as_raw(),
                 process::id(),
-                "tokio-runtime",
+                "async_runtime",
                 TOKIO_THREAD_ID,
             );
         }
     }
 
     fn pick_trace_track(&self) -> (ids::TrackUuid, flavor::Flavor) {
-        #[cfg(feature = "tokio")]
+        #[cfg(feature = "async_runtime")]
         if task::try_id().is_some() {
             return (self.inner.tokio_track_uuid, flavor::Flavor::Async);
         }

@@ -2,8 +2,8 @@ use std::hash;
 use std::hash::Hash as _;
 use std::hash::Hasher as _;
 
-#[cfg(feature = "tokio")]
-use tokio::task;
+#[cfg(feature = "async_runtime")]
+use async_runtime::task;
 
 // Seeds for consistent hashing of pid/tid/task id
 const TRACK_UUID_NS: u32 = 1;
@@ -11,9 +11,9 @@ const SEQUENCE_ID_NS: u32 = 2;
 
 const PROCESS_NS: u32 = 1;
 const THREAD_NS: u32 = 2;
-#[cfg(feature = "tokio")]
+#[cfg(feature = "async_runtime")]
 const TOKIO_NS: u32 = 3;
-#[cfg(feature = "tokio")]
+#[cfg(feature = "async_runtime")]
 const TASK_NS: u32 = 4;
 const COUNTER_NS: u32 = 5;
 
@@ -38,14 +38,14 @@ impl TrackUuid {
         TrackUuid(h.finish())
     }
 
-    #[cfg(feature = "tokio")]
+    #[cfg(feature = "async_runtime")]
     pub fn for_task(id: task::Id) -> TrackUuid {
         let mut h = hash::DefaultHasher::new();
         (TRACK_UUID_NS, TASK_NS, id).hash(&mut h);
         TrackUuid(h.finish())
     }
 
-    #[cfg(feature = "tokio")]
+    #[cfg(feature = "async_runtime")]
     pub fn for_tokio() -> TrackUuid {
         let mut h = hash::DefaultHasher::new();
         (TRACK_UUID_NS, TOKIO_NS).hash(&mut h);
@@ -70,7 +70,7 @@ impl SequenceId {
         SequenceId(h.finish() as u32)
     }
 
-    #[cfg(feature = "tokio")]
+    #[cfg(feature = "async_runtime")]
     pub fn for_task(id: task::Id) -> SequenceId {
         let mut h = hash::DefaultHasher::new();
         (SEQUENCE_ID_NS, TASK_NS, id).hash(&mut h);
