@@ -36,7 +36,7 @@ fn compile(
     includes: &[impl AsRef<path::Path>],
 ) -> anyhow::Result<()> {
     let descriptor_path = path::PathBuf::from(env::var("OUT_DIR")?).join("proto_descriptor.bin");
-
+asdasd
     prost_build::Config::new()
         .bytes(["."])
         .file_descriptor_set_path(&descriptor_path)
