@@ -5,7 +5,12 @@ fn main() -> anyhow::Result<()> {
         .expect("CARGO_MANIFEST_DIR to always be set by `cargo build`");
     let manifest_dir = path::Path::new(&manifest_dir);
 
-    cxx_build::bridge("src/lib.rs")
+    // Bazel does not allow code generation within its sandbox, so we need to compile the pre-generated
+    // code instead. Make sure to re-generate the lib.rs.* everytime the lib.rs is modified.
+    // Note that the generated code must be compiled here together with the rest of the native
+    // files lest some of the generated symbols will be stripped from the final crate library
+    cc::Build::new()
+        .file("tracing-perfetto-sdk-sys/src/lib.rs.cc")
         .file("perfetto-sdk/perfetto.cc")
         .file("src/perfetto-bindings.cc")
         .std("c++17")
@@ -15,7 +20,7 @@ fn main() -> anyhow::Result<()> {
         .flag_if_supported("-Wno-deprecated-declarations")
         .compile("tracing-perfetto-sdk");
 
-    println!("cargo:rerun-if-changed=src/lib.rs");
+    println!("cargo:rerun-if-changed=tracing-perfetto-sdk-sys/lib.rs.cc");
     println!("cargo:rerun-if-changed=src/perfetto-bindings.h");
     println!("cargo:rerun-if-changed=src/perfetto-bindings.cc");
     println!("cargo:rerun-if-changed=perfetto-sdk/perfetto.h");

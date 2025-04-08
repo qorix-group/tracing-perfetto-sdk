@@ -1,8 +1,8 @@
 [package]
 name = "tracing-perfetto-sdk-sys"
-description = "Native C++ bindings for the Perfetto SDK used by tracing-perfetto-sdk"
+description = "Qorix-forked native C++ bindings for the Perfetto SDK used by tracing-perfetto-sdk"
 license = "Apache-2.0"
-repository = "https://github.com/modal-labs/tracing-perfetto-sdk"
+repository = "https://github.com/qorix-group/tracing-perfetto-sdk.git"
 version.workspace = true
 edition.workspace = true
 
@@ -14,6 +14,7 @@ futures = { workspace = true, optional = true }
 [build-dependencies]
 anyhow.workspace = true
 cxx-build.workspace = true
+cc.workspace = true
 
 [features]
 async = ["dep:futures"]
