@@ -20,7 +20,7 @@ genrule(
 )
 
 cc_library(
-    name = "hello_lib",
+    name = "perfetto_sdk",
     srcs = ["src/perfetto-bindings.cc", "perfetto-sdk/perfetto.cc"],
     hdrs = ["src/perfetto-bindings.h", "perfetto-sdk/perfetto.h", "tracing-perfetto-sdk-sys/src/lib.rs.h"],
     visibility = ["//visibility:public"],
@@ -37,5 +37,5 @@ rust_library(
     visibility = ["//visibility:public"],
     deps = all_crate_deps(
         normal = True,
-    ) + [":hello_lib"]
+    ) + [":perfetto_sdk"]
 )

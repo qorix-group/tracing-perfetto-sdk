@@ -9,5 +9,5 @@ rust_library(
     crate_features = ["sdk"],
     deps = all_crate_deps(
         normal = True,
-    ) + ["//crates/schema:schema"]
+    ) + ["//crates/schema:schema", "//crates/sys:sys"]
 )
