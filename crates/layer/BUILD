@@ -6,6 +6,7 @@ rust_library(
     srcs = glob(["src/**/*.rs"]),
     crate_name = "tracing_perfetto_sdk_layer",
     visibility = ["//visibility:public"],
+    crate_features = ["sdk"],
     deps = all_crate_deps(
         normal = True,
     ) + ["//crates/schema:schema"]
