@@ -1,0 +1,31 @@
+load("@crates//:defs.bzl", "aliases", "all_crate_deps")
+load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
+load("@rules_rust//rust:defs.bzl", "rust_library")
+
+rust_library(
+    name = "libtracing_perfetto_sdk_sys",
+    crate_name = "tracing_perfetto_sdk_sys",
+    srcs = [
+        "src/lib.rs",
+    ],
+    visibility = ["//visibility:public"],
+    deps = all_crate_deps(
+        normal = True,
+    ) + [
+        ":build_script",
+    ],
+)
+
+cargo_build_script(
+    name = "build_script",
+    srcs = ["build.rs"],
+    aliases = aliases(),
+    deps = all_crate_deps(
+        build = True,
+    ),
+    data = glob([
+          "perfetto-sdk/**",
+          "src/**",
+          "tracing-perfetto-sdk-sys/**",
+    ]),
+)

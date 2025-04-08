@@ -1,18 +1,7 @@
-use std::{env, path};
+use std::path;
 
 fn main() -> anyhow::Result<()> {
-    let proto_root = path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("protos");
-
-    // https://github.com/google/perfetto/blob/main/protos/perfetto/trace/perfetto_trace.proto
-    let proto_files = &[proto_root.join("perfetto_trace.proto")];
-
-    for proto_file in proto_files {
-        println!("cargo:rerun-if-changed={}", proto_file.display());
-    }
-
-    compile(proto_files, &[proto_root])?;
-
-    Ok(())
+    compile(&["protos/perfetto_trace.proto"], &["protos"]).map(drop)
 }
 
 #[cfg(not(feature = "serde"))]

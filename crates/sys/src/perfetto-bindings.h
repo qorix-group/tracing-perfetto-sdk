@@ -6,7 +6,7 @@ struct PerfettoTracingSession;
 #include "tracing-perfetto-sdk-sys/src/lib.rs.h"
 #include <cstdint>
 #include <memory>
-#include <rust/cxx.h>
+//#include <rust/cxx.h>
 
 using LogCallback = rust::Fn<void(LogLev level, int line, rust::Str filename,
                                   rust::Str message)>;
