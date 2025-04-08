@@ -1,0 +1,39 @@
+
+module(
+    name = "tracing-perfetto-sdk",
+    version = "0.1",
+    compatibility_level = 0,
+)
+
+
+
+
+bazel_dep(name = "bazel_skylib", version = "1.7.1")
+bazel_dep(name = "rules_cc", version = "0.1.1")
+# Rust setup
+bazel_dep(name = "rules_rust", version = "0.58.0")
+bazel_dep(name = "cxx.rs", version = "1.0.136")
+git_override(
+    module_name = "cxx.rs",
+    commit = "d54e44698c3fa5833a861cb3ae502533b92f2f57",
+    remote = "https://github.com/dtolnay/cxx.git",
+)
+
+rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
+rust.toolchain(
+    edition = "2021",
+    versions = ["1.85.0"],
+)
+
+crate = use_extension("@rules_rust//crate_universe:extensions.bzl", "crate")
+crate.from_cargo(
+    name = "crates",
+    cargo_lockfile = "//:Cargo.lock",
+    manifests = [
+        "//:Cargo.toml",
+        "//:crates/layer/Cargo.toml",
+        "//:crates/schema/Cargo.toml",
+        "//:crates/sys/Cargo.toml",
+    ],
+)
+use_repo(crate, "crates")
