@@ -8,3 +8,14 @@ Crates in this workspace are:
   - [tracing-perfetto-sdk-schema](crates/schema) - Proto schema for Perfetto trace packets, etc.
   - [tracing-perfetto-sdk-layer](crates/layer) - A tracing layer compatible with Rust's `tracing-subscriber` crate.
 
+## How to build
+
+### Using Cargo
+```bash
+cargo b
+```
+
+### Using Bazel
+```bash
+bazel build //crates/...
+```
