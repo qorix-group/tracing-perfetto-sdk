@@ -792,8 +792,8 @@ where
         let mut debug_annotations = debug_annotations::ProtoDebugAnnotations::default();
         attrs.record(&mut debug_annotations);
         self.report_counters(meta, debug_annotations.take_counters());
-        // === Store debug annotations in extensions for later use ===
-        span.extensions_mut().insert(debug_annotations.clone());
+        let debug_annotations = debug_annotations.clone(); // clone once if needed
+        span.extensions_mut().insert(debug_annotations.clone()); // insert once
         if flavor == flavor::Flavor::Async {
             if self.inner.delay_slice_begin {
                 span.extensions_mut().insert(debug_annotations);
