@@ -3,9 +3,11 @@ use super::utils::*;
 use std::sync::atomic;
 use std::{borrow, env, marker, mem, process, sync, thread, time};
 
-use prost::encoding;
+use async_runtime::core::types::TaskId;
 #[cfg(feature = "tokio")]
-use tokio::task;
+use async_runtime::scheduler::context::*;
+use prost::encoding;
+
 use tracing::span;
 use tracing_perfetto_sdk_schema as schema;
 use tracing_perfetto_sdk_schema::{
@@ -74,7 +76,7 @@ where
     counter_tracks_sent: dashmap::DashSet<&'static str>,
     thread_tracks_sent: dashmap::DashSet<usize>,
     #[cfg(feature = "tokio")]
-    task_tracks_sent: dashmap::DashSet<task::Id>,
+    task_tracks_sent: dashmap::DashSet<TaskId>,
 }
 
 // Does not contain DebugAnnotations; they are shipped separately as a span
@@ -243,7 +245,7 @@ where
         &self,
         default_track: ids::TrackUuid,
     ) -> Option<(ids::TrackUuid, ids::SequenceId, flavor::Flavor)> {
-        let id = task::try_id()?;
+        let id = ctx_get_running_task_id()?;
         let track_uuid = if self.inner.create_async_tracks.is_some() {
             ids::TrackUuid::for_task(id)
         } else {
@@ -434,7 +436,7 @@ where
 
     #[cfg(feature = "tokio")]
     fn ensure_task_track_known(&self, meta: &tracing::Metadata, name: &str) {
-        if let Some(task_id) = task::try_id() {
+        if let Some(task_id) = ctx_get_running_task_id() {
             if self.inner.task_tracks_sent.insert(task_id) {
                 let packet = self.create_task_track_descriptor(task_id, name.to_owned());
                 self.write_packet(meta, packet);
@@ -542,7 +544,7 @@ where
 
     #[cfg(feature = "tokio")]
     #[must_use]
-    fn create_task_track_descriptor(&self, task_id: task::Id, name: String) -> schema::TracePacket {
+    fn create_task_track_descriptor(&self, task_id: TaskId, name: String) -> schema::TracePacket {
         let parent_uuid = if self.inner.force_flavor == Some(flavor::Flavor::Async) {
             self.inner.process_track_uuid
         } else {
