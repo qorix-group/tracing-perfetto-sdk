@@ -20,7 +20,8 @@ tracing-perfetto-sdk-schema.workspace = true
 tracing-perfetto-sdk-sys = { workspace = true, optional = true }
 tracing-subscriber.workspace = true
 libc = { version = "0.2" }
-async_runtime = { git = "https://github.com/qorix-group/performance_stack_rust.git" , branch = "saumya-async-task-tracing" }
+async_runtime = { path = "/home/saumya/Documents/Clones/performance_stack_rust/async_runtime" }
+#async_runtime = { git = "https://github.com/qorix-group/performance_stack_rust.git" , branch = "saumya-async-task-tracing" }
 
 [dev-dependencies]
 anyhow.workspace = true

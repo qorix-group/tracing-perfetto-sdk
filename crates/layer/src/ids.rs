@@ -3,8 +3,7 @@ use std::hash::Hash as _;
 use std::hash::Hasher as _;
 
 use async_runtime::core::types::TaskId;
-// #[cfg(feature = "tokio")]
-// use async_runtime::scheduler::context::*;
+
 
 // Seeds for consistent hashing of pid/tid/task id
 const TRACK_UUID_NS: u32 = 1;
