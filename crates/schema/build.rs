@@ -1,4 +1,5 @@
 use std::path;
+use std::env;
 
 fn main() -> anyhow::Result<()> {
     compile(&["protos/perfetto_trace.proto"], &["protos"]).map(drop)
