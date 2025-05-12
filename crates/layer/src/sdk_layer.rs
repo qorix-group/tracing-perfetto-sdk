@@ -110,7 +110,7 @@ impl SdkLayer {
         #[cfg(feature = "tokio")]
         let tokio_track_uuid = ids::TrackUuid::for_tokio();
         let thread_local_ctxs = thread_local::ThreadLocal::new();
-
+        #[cfg(feature = "tokio")]
         let inner = sync::Arc::new(Inner {
             ffi_session,
             output_file,

@@ -3,6 +3,7 @@ use super::utils::*;
 use std::sync::atomic;
 use std::{borrow, env, marker, mem, process, sync, thread, time};
 
+#[cfg(feature = "tokio")]
 use async_runtime::core::types::TaskId;
 #[cfg(feature = "tokio")]
 use async_runtime::scheduler::context::*;
