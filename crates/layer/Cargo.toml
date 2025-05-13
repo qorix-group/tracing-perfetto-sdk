@@ -20,7 +20,7 @@ tracing-perfetto-sdk-schema.workspace = true
 tracing-perfetto-sdk-sys = { workspace = true, optional = true }
 tracing-subscriber.workspace = true
 libc = { version = "0.2" }
-async_runtime = { git = "https://github.com/qorix-group/performance_stack_rust.git" , rev = "377d1d621a11e7b095d0593182578dead90ce334" , optional = true }
+async_runtime = { git = "https://github.com/qorix-group/performance_stack_rust.git" , rev = "db9de074e4a61235afb7269df22f7d0162521352" , optional = true }
 
 [dev-dependencies]
 anyhow.workspace = true
