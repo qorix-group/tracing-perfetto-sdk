@@ -26,7 +26,7 @@ checksum = "c1fd03a028ef38ba2276dce7e33fcd6369c158a1bca17946c4b1b701891c1ff7"
 [[package]]
 name = "async_runtime"
 version = "0.1.0"
-source = "git+https://github.com/qorix-group/performance_stack_rust.git?rev=377d1d621a11e7b095d0593182578dead90ce334#377d1d621a11e7b095d0593182578dead90ce334"
+source = "git+https://github.com/qorix-group/performance_stack_rust.git?rev=787e0036b1a0cf40d24cd0637ea4d6d56df86b87#787e0036b1a0cf40d24cd0637ea4d6d56df86b87"
 dependencies = [
  "foundation",
  "iceoryx2-pal-concurrency-sync",
@@ -328,7 +328,7 @@ checksum = "f81ec6369c545a7d40e4589b5597581fa1c441fe1cce96dd1de43159910a36a2"
 [[package]]
 name = "foundation"
 version = "0.1.0"
-source = "git+https://github.com/qorix-group/performance_stack_rust.git?rev=377d1d621a11e7b095d0593182578dead90ce334#377d1d621a11e7b095d0593182578dead90ce334"
+source = "git+https://github.com/qorix-group/performance_stack_rust.git?rev=787e0036b1a0cf40d24cd0637ea4d6d56df86b87#787e0036b1a0cf40d24cd0637ea4d6d56df86b87"
 dependencies = [
  "iceoryx2-bb-container",
  "iceoryx2-bb-derive-macros",
@@ -342,6 +342,7 @@ dependencies = [
  "iceoryx2-pal-concurrency-sync",
  "loom",
  "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]
