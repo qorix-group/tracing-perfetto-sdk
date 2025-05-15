@@ -4,7 +4,7 @@ use std::sync::atomic;
 use std::{borrow, env, fs, process, sync, thread, time};
 
 #[cfg(feature = "tokio")]
-use tokio::task;
+use async_runtime::scheduler::context::*;
 use tracing::span;
 use tracing_perfetto_sdk_schema as schema;
 use tracing_perfetto_sdk_sys::ffi;
@@ -110,7 +110,7 @@ impl SdkLayer {
         #[cfg(feature = "tokio")]
         let tokio_track_uuid = ids::TrackUuid::for_tokio();
         let thread_local_ctxs = thread_local::ThreadLocal::new();
-
+        #[cfg(feature = "tokio")]
         let inner = sync::Arc::new(Inner {
             ffi_session,
             output_file,
@@ -197,7 +197,7 @@ impl SdkLayer {
 
     fn pick_trace_track(&self) -> (ids::TrackUuid, flavor::Flavor) {
         #[cfg(feature = "tokio")]
-        if task::try_id().is_some() {
+        if ctx_get_running_task_id().is_some() {
             return (self.inner.tokio_track_uuid, flavor::Flavor::Async);
         }
 

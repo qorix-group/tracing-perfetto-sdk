@@ -3,7 +3,7 @@ use std::hash::Hash as _;
 use std::hash::Hasher as _;
 
 #[cfg(feature = "tokio")]
-use tokio::task;
+use async_runtime::core::types::TaskId;
 
 // Seeds for consistent hashing of pid/tid/task id
 const TRACK_UUID_NS: u32 = 1;
@@ -39,7 +39,7 @@ impl TrackUuid {
     }
 
     #[cfg(feature = "tokio")]
-    pub fn for_task(id: task::Id) -> TrackUuid {
+    pub fn for_task(id: TaskId) -> TrackUuid {
         let mut h = hash::DefaultHasher::new();
         (TRACK_UUID_NS, TASK_NS, id).hash(&mut h);
         TrackUuid(h.finish())
@@ -71,7 +71,7 @@ impl SequenceId {
     }
 
     #[cfg(feature = "tokio")]
-    pub fn for_task(id: task::Id) -> SequenceId {
+    pub fn for_task(id: TaskId) -> SequenceId {
         let mut h = hash::DefaultHasher::new();
         (SEQUENCE_ID_NS, TASK_NS, id).hash(&mut h);
         SequenceId(h.finish() as u32)
