@@ -5,11 +5,29 @@ fn main() -> anyhow::Result<()> {
         .expect("CARGO_MANIFEST_DIR to always be set by `cargo build`");
     let manifest_dir = path::Path::new(&manifest_dir);
 
+    let mut builder = cc::Build::new();
+
+    let c = env::var_os("CXX");
+
+    if c.as_ref()
+        .unwrap_or(&"".into())
+        .to_str()
+        .unwrap()
+        .contains("llvm")
+    {
+        println!("cargo:rustc-link-arg=-lstdc++");
+        println!("cargo:rustc-link-lib=stdc++");
+    }
+
+    if c.is_some() {
+        builder.compiler(c.unwrap());
+    }
+
     // Bazel does not allow code generation within its sandbox, so we need to compile the pre-generated
     // code instead. Make sure to re-generate the lib.rs.* everytime the lib.rs is modified.
     // Note that the generated code must be compiled here together with the rest of the native
     // files lest some of the generated symbols will be stripped from the final crate library
-    cc::Build::new()
+    builder
         .file("tracing-perfetto-sdk-sys/src/lib.rs.cc")
         .file("perfetto-sdk/perfetto.cc")
         .file("src/perfetto-bindings.cc")
